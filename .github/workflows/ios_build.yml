@@ -7,11 +7,11 @@ on:
 
 jobs:
   build-ios:
-    name: Build iOS App
+    name: Build & Deploy iOS to App Store Connect
     runs-on: macos-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Java Development Kit
@@ -33,35 +33,78 @@ jobs:
         run: flutter precache --ios
 
       - name: Install Dependencies
-        run: flutter pub get
-
-      - name: Build iOS App (No Codesign)
-        run: flutter build ios --release --no-codesign
-
-      - name: Package iOS IPA & App Bundle
         run: |
-          mkdir -p build/ios/iphoneos/Payload
-          cp -r build/ios/iphoneos/Runner.app build/ios/iphoneos/Payload/
-          cd build/ios/iphoneos
-          zip -r usaweather-ios.ipa Payload
-          zip -r Runner.app.zip Runner.app
+          flutter pub get
+          flutter build ios --config-only --release
 
-      - name: Upload iOS Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: usaweather-ios-build
-          path: |
-            build/ios/iphoneos/usaweather-ios.ipa
-            build/ios/iphoneos/Runner.app.zip
-          retention-days: 30
-
-      - name: Upload IPA to App Store Connect / TestFlight
+      - name: Write App Store Connect API Key File
         run: |
           mkdir -p "$HOME/.appstoreconnect/private_keys"
-          printf "%s\n" "-----BEGIN PRIVATE KEY-----" > "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
-          printf "%s\n" "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQggirxemIOJ0dlsLBJ" >> "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
-          printf "%s\n" "9jbKPEcTJWI5i4OqpR+6Hv0JJ6KgCgYIKoZIzj0DAQehRANCAARACJZYyIKA/J4A" >> "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
-          printf "%s\n" "E0oWMjQECeR0pfOndYymen5P8Q7ba7o4l+IdZzDSNjbZyQ0I6oVlZi54EbeUkz9m" >> "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
-          printf "%s\n" "xMlFxhoE" >> "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
-          printf "%s\n" "-----END PRIVATE KEY-----" >> "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
-          xcrun altool --upload-app -f build/ios/iphoneos/usaweather-ios.ipa -t ios --apiKey 9HC3ZFHYQ7 --apiIssuer b4575c22-8a31-4f97-bed4-889e3c21a7b5 --verbose || echo "Upload command finished"
+          mkdir -p "$HOME/private_keys"
+          TARGET_KEY="$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
+          printf "%s\n" "-----BEGIN PRIVATE KEY-----" > "$TARGET_KEY"
+          printf "%s\n" "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQggirxemIOJ0dlsLBJ" >> "$TARGET_KEY"
+          printf "%s\n" "9jbKPEcTJWI5i4OqpR+6Hv0JJ6KgCgYIKoZIzj0DAQehRANCAARACJZYyIKA/J4A" >> "$TARGET_KEY"
+          printf "%s\n" "E0oWMjQECeR0pfOndYymen5P8Q7ba7o4l+IdZzDSNjbZyQ0I6oVlZi54EbeUkz9m" >> "$TARGET_KEY"
+          printf "%s\n" "xMlFxhoE" >> "$TARGET_FILE" 2>/dev/null || true
+          printf "%s\n" "xMlFxhoE" >> "$TARGET_KEY"
+          printf "%s\n" "-----END PRIVATE KEY-----" >> "$TARGET_KEY"
+          cp "$TARGET_KEY" "$HOME/private_keys/AuthKey_9HC3ZFHYQ7.p8"
+
+      - name: Create ExportOptions.plist
+        run: |
+          cat <<EOF > ios/ExportOptions.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>destination</key>
+              <string>export</string>
+              <key>method</key>
+              <string>app-store-connect</string>
+              <key>teamID</key>
+              <string>JTVCP8PGV8</string>
+              <key>uploadSymbols</key>
+              <true/>
+              <key>manageAppVersionAndBuildNumber</key>
+              <true/>
+              <key>signingStyle</key>
+              <string>automatic</string>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Build Unsigned IPA Archive via Flutter
+        run: |
+          BUILD_NUM=$((10 + GITHUB_RUN_NUMBER))
+          echo "Building iOS archive with dynamic build number: $BUILD_NUM"
+          flutter build ipa --release --no-codesign --build-number=$BUILD_NUM
+
+      - name: Export Signed IPA via App Store Connect API Key
+        run: |
+          KEY_PATH="$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
+          ARCHIVE_PATH=$(find build/ios -name "*.xcarchive" -type d 2>/dev/null | head -n 1)
+          if [ -z "$ARCHIVE_PATH" ]; then
+            ARCHIVE_PATH="build/ios/archive/Runner.xcarchive"
+          fi
+          echo "Found xcarchive at: $ARCHIVE_PATH"
+
+          mkdir -p build/ios/ipa
+
+          xcodebuild -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            -exportPath build/ios/ipa \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY_PATH" \
+            -authenticationKeyID "9HC3ZFHYQ7" \
+            -authenticationKeyIssuerID "b4575c22-8a31-4f97-bed4-889e3c21a7b5"
+
+      - name: Upload Signed IPA to App Store Connect / TestFlight
+        run: |
+          IPA_FILE=$(find build/ios/ipa -name "*.ipa" 2>/dev/null | head -n 1)
+          if [ -z "$IPA_FILE" ]; then
+            IPA_FILE=$(find build/ios -name "*.ipa" 2>/dev/null | head -n 1)
+          fi
+          echo "Uploading $IPA_FILE to App Store Connect..."
+          xcrun altool --upload-app -f "$IPA_FILE" -t ios --apiKey "9HC3ZFHYQ7" --apiIssuer "b4575c22-8a31-4f97-bed4-889e3c21a7b5" --verbose
