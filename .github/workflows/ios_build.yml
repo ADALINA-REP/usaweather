@@ -35,7 +35,7 @@ jobs:
       - name: Install Dependencies
         run: |
           flutter pub get
-          flutter build ios --config-only --release
+          flutter build ios --config-only --release --no-codesign
 
       - name: Write App Store Connect API Key File
         run: |
