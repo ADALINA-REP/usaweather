@@ -58,12 +58,10 @@ jobs:
       - name: Upload IPA to App Store Connect / TestFlight
         run: |
           mkdir -p "$HOME/.appstoreconnect/private_keys"
-          cat <<'EOF' > "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
------BEGIN PRIVATE KEY-----
-MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQggirxemIOJ0dlsLBJ
-9jbKPEcTJWI5i4OqpR+6Hv0JJ6KgCgYIKoZIzj0DAQehRANCAARACJZYyIKA/J4A
-E0oWMjQECeR0pfOndYymen5P8Q7ba7o4l+IdZzDSNjbZyQ0I6oVlZi54EbeUkz9m
-xMlFxhoE
------END PRIVATE KEY-----
-EOF
-          xcrun altool --upload-app -f build/ios/iphoneos/usaweather-ios.ipa -t ios --apiKey 9HC3ZFHYQ7 --apiIssuer b4575c22-8a31-4f97-bed4-889e3c21a7b5 --verbose || echo "Upload completed with status"
+          printf "%s\n" "-----BEGIN PRIVATE KEY-----" > "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
+          printf "%s\n" "MIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQggirxemIOJ0dlsLBJ" >> "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
+          printf "%s\n" "9jbKPEcTJWI5i4OqpR+6Hv0JJ6KgCgYIKoZIzj0DAQehRANCAARACJZYyIKA/J4A" >> "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
+          printf "%s\n" "E0oWMjQECeR0pfOndYymen5P8Q7ba7o4l+IdZzDSNjbZyQ0I6oVlZi54EbeUkz9m" >> "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
+          printf "%s\n" "xMlFxhoE" >> "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
+          printf "%s\n" "-----END PRIVATE KEY-----" >> "$HOME/.appstoreconnect/private_keys/AuthKey_9HC3ZFHYQ7.p8"
+          xcrun altool --upload-app -f build/ios/iphoneos/usaweather-ios.ipa -t ios --apiKey 9HC3ZFHYQ7 --apiIssuer b4575c22-8a31-4f97-bed4-889e3c21a7b5 --verbose || echo "Upload command finished"
