@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MeteoEspagne — Weather for Spain &amp; Beyond. Real-time weather, forecasts, radar and air quality.">
+  <meta name="theme-color" content="#0A0E2E">
+
+  <!-- PWA / iOS meta tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MeteoEspagne">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <title>MeteoEspagne — Weather for Spain</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Google Maps JavaScript API (for web radar) -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCbRqBJBzqc6sBBPiWAwUmkpXbYU8LJkE" async defer></script>
+
+  <style>
+    /* Prevent white flash during load */
+    html, body {
+      background-color: #0A0E2E;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    /* Loading indicator */
+    #loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #0A0E2E 0%, #1A237E 50%, #0288D1 100%);
+      color: white;
+      font-family: system-ui, sans-serif;
+      gap: 20px;
+    }
+    #loading .logo { font-size: 64px; }
+    #loading h1 { margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 2px; }
+    #loading p { margin: 0; opacity: 0.6; font-size: 14px; }
+    #loading .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: #00B4D8;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <!-- Splash shown before Flutter initializes -->
+  <div id="loading">
+    <img src="icons/Icon-192.png" width="84" height="84" style="border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);" alt="MeteoEspagne Logo" />
+    <h1>MeteoEspagne</h1>
+    <p>Weather for Spain &amp; Beyond</p>
+    <div class="spinner"></div>
+  </div>
+
+  <script src="flutter_bootstrap.js" async></script>
+
+  <script>
+    // Hide loading screen once Flutter is ready
+    window.addEventListener('flutter-first-frame', function() {
+      var loading = document.getElementById('loading');
+      if (loading) {
+        loading.style.transition = 'opacity 0.5s';
+        loading.style.opacity = '0';
+        setTimeout(function() { loading.remove(); }, 500);
+      }
+    });
+  </script>
+</body>
+</html>

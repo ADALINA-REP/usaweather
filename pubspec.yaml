@@ -1,0 +1,52 @@
+name: usaweather
+description: "USA Weather - Weather forecast & radar for United States."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.11.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+
+  # Navigation
+  go_router: ^14.2.7
+
+  # HTTP
+  dio: ^5.4.3+1
+
+  # Dependency Injection
+  get_it: ^7.7.0
+
+  # Location & Maps
+  geolocator: ^12.0.0
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+
+  # Local Storage
+  shared_preferences: ^2.3.0
+
+  # Ads (mobile only)
+  google_mobile_ads: ^5.1.0
+
+  # Notifications
+  flutter_local_notifications: ^17.2.2
+
+  # Utilities
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/

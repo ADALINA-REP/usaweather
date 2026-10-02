@@ -1,0 +1,117 @@
+@Composable
+fun SunsetCard(sunrise: String?, sunset: String?) {
+    val currentTime = java.time.LocalTime.now()
+    val sunriseTime = try { java.time.LocalTime.parse(sunrise?.substringAfterLast("T")?.substring(0, 5)) } catch (e: Exception) { java.time.LocalTime.of(6, 30) }
+    val sunsetTime = try { java.time.LocalTime.parse(sunset?.substringAfterLast("T")?.substring(0, 5)) } catch (e: Exception) { java.time.LocalTime.of(19, 30) }
+
+    val amPmFormatter = java.time.format.DateTimeFormatter.ofPattern("h:mm a", java.util.Locale.ENGLISH)
+
+    // Calculate progress between sunrise and sunset
+    val totalSeconds = sunsetTime.toSecondOfDay() - sunriseTime.toSecondOfDay()
+    val currentSeconds = currentTime.toSecondOfDay() - sunriseTime.toSecondOfDay()
+    val progress = if (totalSeconds > 0) (currentSeconds.toFloat() / totalSeconds).coerceIn(0f, 1f) else 0f
+    val isDay = currentTime.isAfter(sunriseTime) && currentTime.isBefore(sunsetTime)
+
+    // Pulse animation for the sun dot
+    val infiniteTransition = rememberInfiniteTransition(label = "sun_pulse")
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.3f,
+        animationSpec = infiniteRepeatable(animation = tween(1500), repeatMode = RepeatMode.Reverse),
+        label = "pulse"
+    )
+
+    GlassCard(modifier = Modifier.fillMaxWidth().height(140.dp)) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("☀️", fontSize = 11.sp)
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(stringResource(R.string.sun_title).uppercase(), style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.4f), fontWeight = FontWeight.Bold)
+            }
+            
+            Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                Canvas(modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(top = 10.dp, bottom = 30.dp, start = 12.dp, end = 12.dp)) {
+                    val w = size.width
+                    val h = size.height
+                    val baselineY = h * 0.95f
+                    val peakY = h * 0.15f
+                    
+                    // 1. Horizon Line (Very subtle)
+                    drawLine(
+                        color = Color.White.copy(alpha = 0.08f),
+                        start = Offset(0f, baselineY),
+                        end = Offset(w, baselineY),
+                        strokeWidth = 1.dp.toPx()
+                    )
+                    
+                    // 2. Full Trajectory Arc
+                    val fullPath = Path().apply {
+                        moveTo(0f, baselineY)
+                        quadraticBezierTo(w / 2f, peakY - (h * 0.25f), w, baselineY)
+                    }
+                    
+                    // Shadow/Glow under the arc
+                    drawPath(
+                        path = fullPath,
+                        brush = Brush.verticalGradient(listOf(Color(0xFFFFD54F).copy(alpha = 0.1f), Color.Transparent)),
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(width = 8.dp.toPx(), cap = StrokeCap.Round)
+                    )
+                    
+                    // Dashed track
+                    drawPath(
+                        path = fullPath,
+                        color = Color.White.copy(alpha = 0.15f),
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(
+                            width = 1.5.dp.toPx(), 
+                            pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 10f), 0f)
+                        )
+                    )
+                    
+                    if (isDay) {
+                        val t = progress
+                        val x = w * t
+                        val y = (1 - t) * (1 - t) * baselineY + 2 * (1 - t) * t * (peakY - (h * 0.25f)) + t * t * baselineY
+                        
+                        // Active Arc (Yellow segment)
+                        // Path clipping is hard in Canvas, so we'll emphasize the dot and glow
+                        
+                        // Glow around sun
+                        drawCircle(
+                            color = Color(0xFFFFD54F).copy(alpha = 0.2f * (2f - pulseScale)),
+                            radius = 20.dp.toPx() * pulseScale,
+                            center = Offset(x, y)
+                        )
+                        
+                        // Current Sun Dot
+                        drawCircle(
+                            color = Color(0xFFFFD54F),
+                            radius = 5.dp.toPx(),
+                            center = Offset(x, y)
+                        )
+                    }
+                }
+                
+                // Centered Times (Smaller & Cleaner)
+                Row(
+                    modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter).padding(bottom = 0.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        sunriseTime.format(amPmFormatter), 
+                        style = MaterialTheme.typography.labelMedium, 
+                        color = Color.White.copy(alpha = 0.7f), 
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                    Text(
+                        sunsetTime.format(amPmFormatter), 
+                        style = MaterialTheme.typography.labelMedium, 
+                        color = Color.White.copy(alpha = 0.7f), 
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                }
+            }
+        }
+    }
+}
