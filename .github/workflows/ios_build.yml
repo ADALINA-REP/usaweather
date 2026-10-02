@@ -26,11 +26,18 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Precache iOS Artifacts
+        run: flutter precache --ios
+
       - name: Install Dependencies
         run: flutter pub get
 
       - name: Build iOS App (No Codesign)
-        run: flutter build ios --release --no-codesign
+        run: |
+          cd ios
+          pod install --repo-update || true
+          cd ..
+          flutter build ios --release --no-codesign
 
       - name: Zip iOS App Bundle
         run: |
