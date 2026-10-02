@@ -26,6 +26,9 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Disable Swift Package Manager in Flutter
+        run: flutter config --no-enable-swift-package-manager
+
       - name: Precache iOS Artifacts
         run: flutter precache --ios
 
