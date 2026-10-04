@@ -78,10 +78,10 @@ class SettingsRepository {
   /// Resolves the effective language code according to the strict priority:
   /// 1. User's manually selected language
   /// 2. Device system language (if supported)
-  /// 3. Application default fallback ('es')
+  /// 3. Application default fallback ('en')
   String resolveEffectiveLanguageCode([String? deviceLanguageCode]) {
     if (!isSystemLanguage) {
-      return languageMap[selectedLanguage] ?? 'es';
+      return languageMap[selectedLanguage] ?? 'en';
     }
     if (deviceLanguageCode != null &&
         supportedLanguageCodes.contains(deviceLanguageCode.toLowerCase())) {

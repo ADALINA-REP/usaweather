@@ -298,8 +298,8 @@ class _LanguagePicker extends StatelessWidget {
             children: languages.map((lang) {
               const flagMap = {
                 'System Default': '🌐',
-                'Spanish':    '🇺🇸',
-                'English':    '🇬🇧',
+                'English':    '🇺🇸',
+                'Spanish':    '🇪🇸',
                 'French':     '🇫🇷',
                 'German':     '🇩🇪',
                 'Italian':    '🇮🇹',

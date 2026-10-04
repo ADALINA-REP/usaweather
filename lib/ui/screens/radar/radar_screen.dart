@@ -223,7 +223,7 @@ class _RadarScreenState extends ConsumerState<RadarScreen> {
               // Base Map Layer (Esri Dark Canvas / OpenStreetMap / Esri Satellite)
               TileLayer(
                 urlTemplate: baseTileUrl,
-                userAgentPackageName: 'com.spainweather.tiempo',
+                userAgentPackageName: 'com.usweather.radarforecast',
                 tileProvider: NetworkTileProvider(),
                 tileBuilder: isDark && !_useSatelliteMode
                     ? (context, tileWidget, tile) {
@@ -247,7 +247,7 @@ class _RadarScreenState extends ConsumerState<RadarScreen> {
                   child: TileLayer(
                     urlTemplate:
                         '$_host${currentFrame.path}/256/{z}/{x}/{y}/2/1_1.png',
-                    userAgentPackageName: 'com.spainweather.tiempo',
+                    userAgentPackageName: 'com.usweather.radarforecast',
                     tileProvider: NetworkTileProvider(),
                   ),
                 ),

@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:usaweather/core/constants/spain_cities.dart';
+import 'package:usaweather/core/constants/us_cities.dart';
 import 'package:usaweather/core/di/injection.dart';
 import 'package:usaweather/core/localization/app_localizations.dart';
 import 'package:usaweather/core/router/app_router.dart';
@@ -13,7 +13,7 @@ import 'package:usaweather/ui/components/glass_card.dart';
 import 'package:usaweather/ui/screens/home/home_provider.dart';
 
 final _searchProvider = StateProvider<String>((ref) => '');
-final _selectedRegionProvider = StateProvider<String>((ref) => 'Todas');
+final _selectedRegionProvider = StateProvider<String>((ref) => 'All');
 
 final _onlineResultsProvider =
     FutureProvider.family<List<LocationData>, String>((ref, query) async {
@@ -34,13 +34,12 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
   final _ctrl = TextEditingController();
 
   static const List<String> _regions = [
-    'Todas',
-    'Centro',
-    'Cataluña & Aragón',
-    'Andalucía',
-    'Levante',
-    'Norte',
-    'Islas',
+    'All',
+    'East',
+    'West',
+    'Midwest',
+    'South',
+    'Pacific & Offshore',
   ];
 
   @override
@@ -57,15 +56,15 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
     final onlineAsync = ref.watch(_onlineResultsProvider(query));
     final l10n = AppLocalizations.of(context);
 
-    // Filter local Spanish cities
-    final filteredSpainCities = SpainCities.cities.where((city) {
+    // Filter local US cities
+    final filteredUsCities = UsCities.cities.where((city) {
       final matchesRegion =
-          selectedRegion == 'Todas' || city.regionGroup == selectedRegion;
+          selectedRegion == 'All' || selectedRegion == 'Todas' || city.regionGroup == selectedRegion;
       final q = query.trim().toLowerCase();
       if (q.isEmpty) return matchesRegion;
       final matchesQuery = city.name.toLowerCase().contains(q) ||
-          city.province.toLowerCase().contains(q) ||
-          city.community.toLowerCase().contains(q);
+          city.state.toLowerCase().contains(q) ||
+          city.stateCode.toLowerCase().contains(q);
       return matchesQuery;
     }).toList();
 
@@ -161,7 +160,7 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
                 itemBuilder: (context, i) {
                   final reg = _regions[i];
                   final isSelected = reg == selectedRegion;
-                  final displayLabel = reg == 'Todas' ? l10n.allRegions : reg;
+                  final displayLabel = (reg == 'All' || reg == 'Todas') ? l10n.allRegions : reg;
 
                   return GestureDetector(
                     onTap: () {
@@ -228,15 +227,15 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
               children: [
-                // Header for Spanish cities
-                if (filteredSpainCities.isNotEmpty) ...[
+                // Header for US cities
+                if (filteredUsCities.isNotEmpty) ...[
                   Padding(
                     padding: const EdgeInsets.only(left: 4, bottom: 8, top: 4),
                     child: Text(
                       query.isEmpty
-                          ? '$selectedRegion (${filteredSpainCities.length} ciudades)'
+                          ? '${selectedRegion == "All" ? l10n.allRegions : selectedRegion} (${filteredUsCities.length})'
                               .toUpperCase()
-                          : 'Ciudades encontradas (${filteredSpainCities.length})'
+                          : '${l10n.citiesTitle} (${filteredUsCities.length})'
                               .toUpperCase(),
                       style: TextStyle(
                         color: (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
@@ -246,7 +245,7 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
                       ),
                     ),
                   ),
-                  ...filteredSpainCities.map((city) => _buildSpainCityCard(
+                  ...filteredUsCities.map((city) => _buildUsCityCard(
                         context,
                         city,
                         isDark,
@@ -259,7 +258,7 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
                   onlineAsync.when(
                     data: (results) {
                       final nonDuplicates = results.where((r) {
-                        return !filteredSpainCities.any((local) =>
+                        return !filteredUsCities.any((local) =>
                             local.name.toLowerCase() ==
                             r.name.toLowerCase());
                       }).toList();
@@ -274,7 +273,7 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
                           Padding(
                             padding: const EdgeInsets.only(left: 4, bottom: 8),
                             child: Text(
-                              'OTRAS UBICACIONES / MÁS RESULTADOS'.toUpperCase(),
+                              'MORE RESULTS'.toUpperCase(),
                               style: TextStyle(
                                 color: (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                                 fontSize: 11,
@@ -305,7 +304,7 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
                 ],
 
                 // Empty state
-                if (filteredSpainCities.isEmpty && query.isNotEmpty)
+                if (filteredUsCities.isEmpty && query.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 48),
                     child: Center(
@@ -333,8 +332,8 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
     );
   }
 
-  Widget _buildSpainCityCard(
-      BuildContext context, SpainCityItem city, bool isDark) {
+  Widget _buildUsCityCard(
+      BuildContext context, UsCityItem city, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: GlassCard(
@@ -375,7 +374,7 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
             ),
           ),
           subtitle: Text(
-            '${city.province} · ${city.community}',
+            '${city.state} · ${city.stateCode}',
             style: TextStyle(
               color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
               fontSize: 12,

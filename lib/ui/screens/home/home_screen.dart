@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:usaweather/core/constants/spain_cities.dart';
+import 'package:usaweather/core/constants/us_cities.dart';
 import 'package:usaweather/core/di/injection.dart';
 import 'package:usaweather/core/localization/app_localizations.dart';
 import 'package:usaweather/core/theme/app_theme.dart';
@@ -1959,18 +1959,17 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
   final TextEditingController _controller = TextEditingController();
   Timer? _debounceTimer;
   String _query = '';
-  String _selectedRegion = 'Todas';
+  String _selectedRegion = 'All';
   List<LocationData> _onlineResults = [];
   bool _isSearchingOnline = false;
 
   static const List<String> _regions = [
-    'Todas',
-    'Centro',
-    'Cataluña & Aragón',
-    'Andalucía',
-    'Levante',
-    'Norte',
-    'Islas',
+    'All',
+    'East',
+    'West',
+    'Midwest',
+    'South',
+    'Pacific & Offshore',
   ];
 
   @override
@@ -2028,7 +2027,7 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
     Navigator.pop(context);
   }
 
-  void _submit(List<SpainCityItem> filteredLocal) {
+  void _submit(List<UsCityItem> filteredLocal) {
     final q = _query.trim();
     if (q.isEmpty) return;
 
@@ -2048,18 +2047,18 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
     final l10n = AppLocalizations.of(context);
 
     final qLower = _query.trim().toLowerCase();
-    final filteredSpainCities = SpainCities.cities.where((city) {
+    final filteredUsCities = UsCities.cities.where((city) {
       final matchesRegion =
-          _selectedRegion == 'Todas' || city.regionGroup == _selectedRegion;
+          _selectedRegion == 'All' || _selectedRegion == 'Todas' || city.regionGroup == _selectedRegion;
       if (qLower.isEmpty) return matchesRegion;
       return city.name.toLowerCase().contains(qLower) ||
-          city.province.toLowerCase().contains(qLower) ||
-          city.community.toLowerCase().contains(qLower);
+          city.state.toLowerCase().contains(qLower) ||
+          city.stateCode.toLowerCase().contains(qLower);
     }).toList();
 
     // Filter out online duplicates
     final nonDuplicateOnline = _onlineResults.where((r) {
-      return !filteredSpainCities.any((local) =>
+      return !filteredUsCities.any((local) =>
           local.name.toLowerCase() == r.name.toLowerCase());
     }).toList();
 
@@ -2113,7 +2112,7 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
                   controller: _controller,
                   autofocus: true,
                   onChanged: _onQueryChanged,
-                  onSubmitted: (_) => _submit(filteredSpainCities),
+                  onSubmitted: (_) => _submit(filteredUsCities),
                   style: TextStyle(
                     color: isDark ? Colors.white : const Color(0xFF0F172A),
                     fontWeight: FontWeight.w600,
@@ -2148,7 +2147,7 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
                           ),
                         IconButton(
                           icon: const Icon(Icons.arrow_forward_rounded, color: Color(0xFF00B4D8)),
-                          onPressed: () => _submit(filteredSpainCities),
+                          onPressed: () => _submit(filteredUsCities),
                         ),
                       ],
                     ),
@@ -2169,7 +2168,7 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
                     itemBuilder: (context, i) {
                       final reg = _regions[i];
                       final isSelected = reg == _selectedRegion;
-                      final displayLabel = reg == 'Todas' ? l10n.allRegions : reg;
+                      final displayLabel = (reg == 'All' || reg == 'Todas') ? l10n.allRegions : reg;
                       return ChoiceChip(
                         label: Text(displayLabel),
                         selected: isSelected,
@@ -2207,14 +2206,14 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
                   controller: scrollController,
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                   children: [
-                    // Section Header for Spanish Cities
-                    if (filteredSpainCities.isNotEmpty) ...[
+                    // Section Header for US Cities
+                    if (filteredUsCities.isNotEmpty) ...[
                       Padding(
                         padding: const EdgeInsets.only(left: 4, bottom: 8, top: 4),
                         child: Text(
                           _query.isEmpty
-                              ? 'US CITIES (${filteredSpainCities.length})'
-                              : 'CIUDADES ENCONTRADAS (${filteredSpainCities.length})',
+                              ? 'US CITIES (${filteredUsCities.length})'
+                              : 'CITIES FOUND (${filteredUsCities.length})',
                           style: TextStyle(
                             color: (isDark ? Colors.white70 : Colors.black54)
                                 .withValues(alpha: 0.6),
@@ -2224,8 +2223,8 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
                           ),
                         ),
                       ),
-                      ...filteredSpainCities.map(
-                        (city) => _buildSpainCityItem(context, city, isDark),
+                      ...filteredUsCities.map(
+                        (city) => _buildUsCityItem(context, city, isDark),
                       ),
                     ],
 
@@ -2250,7 +2249,7 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
                         Padding(
                           padding: const EdgeInsets.only(left: 4, bottom: 8),
                           child: Text(
-                            'OTRAS UBICACIONES / MÁS RESULTADOS'.toUpperCase(),
+                            'MORE LOCATIONS / RESULTS'.toUpperCase(),
                             style: TextStyle(
                               color: (isDark ? Colors.white70 : Colors.black54)
                                   .withValues(alpha: 0.6),
@@ -2267,7 +2266,7 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
                     ],
 
                     // Empty State
-                    if (filteredSpainCities.isEmpty &&
+                    if (filteredUsCities.isEmpty &&
                         nonDuplicateOnline.isEmpty &&
                         !_isSearchingOnline &&
                         _query.isNotEmpty)
@@ -2301,8 +2300,8 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
     );
   }
 
-  Widget _buildSpainCityItem(
-      BuildContext context, SpainCityItem city, bool isDark) {
+  Widget _buildUsCityItem(
+      BuildContext context, UsCityItem city, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: GlassCard(
@@ -2331,7 +2330,7 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
             ),
           ),
           subtitle: Text(
-            '${city.province} · ${city.community}',
+            '${city.state} · ${city.stateCode}',
             style: TextStyle(
               color: isDark ? Colors.white60 : Colors.black54,
               fontSize: 12,

@@ -53,7 +53,7 @@ class ApiConstants {
   // Google Maps
   static const String googleMapsApiKey = 'AIzaSyBCbRqBJBzqc6sBBPiWAwUmkpXbYU8LJkE';
 
-  // Default location (Madrid, Spain)
+  // Default location (New York City, USA)
   static const String defaultCity = 'New York City';
   static const double defaultLat = 40.7128;
   static const double defaultLon = -74.0060;

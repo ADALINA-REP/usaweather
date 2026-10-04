@@ -1,11 +1,11 @@
 {
-    "name": "MeteoEspagne",
-    "short_name": "MeteoES",
+    "name": "USA Weather",
+    "short_name": "USA Weather",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0A0E2E",
     "theme_color": "#0A0E2E",
-    "description": "Weather for Spain & Beyond — real-time weather, 7-day forecasts, radar and air quality.",
+    "description": "Weather for USA & Beyond — real-time weather, 7-day forecasts, radar and air quality.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
