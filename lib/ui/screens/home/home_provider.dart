@@ -218,7 +218,7 @@ final appLocaleProvider = Provider<Locale>((ref) {
   try {
     deviceLang = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
   } catch (_) {
-    deviceLang = 'es';
+    deviceLang = 'en';
   }
   final code = repo.resolveEffectiveLanguageCode(deviceLang);
   return Locale(code);

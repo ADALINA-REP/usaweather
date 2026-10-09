@@ -340,7 +340,7 @@ class _DailyForecastDetailScreenState extends State<DailyForecastDetailScreen> {
                                   const SizedBox(height: 6),
                                   Text(
                                     '${l10n.feelsLike}: $apparentMax$unitStr',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: subtitleColor,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
@@ -744,7 +744,7 @@ class _DailyForecastDetailScreenState extends State<DailyForecastDetailScreen> {
                                               fontWeight: FontWeight.w800,
                                             ),
                                           ),
-                                          Text(
+                                          const Text(
                                             'mb',
                                             style: TextStyle(
                                               color: subtitleColor,
@@ -760,7 +760,7 @@ class _DailyForecastDetailScreenState extends State<DailyForecastDetailScreen> {
                               Center(
                                 child: Text(
                                   l10n.steady,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: subtitleColor,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w500,
@@ -821,7 +821,7 @@ class _DailyForecastDetailScreenState extends State<DailyForecastDetailScreen> {
                                 children: [
                                   Text(
                                     '${uv.round()}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: subtitleColor,
                                       fontSize: 10,
                                       fontWeight: FontWeight.w600,
@@ -873,7 +873,7 @@ class _DailyForecastDetailScreenState extends State<DailyForecastDetailScreen> {
                               Center(
                                 child: Text(
                                   '${l10n.windGusts}: $gusts km/h',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: subtitleColor,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w500,
@@ -944,7 +944,7 @@ class _DailyForecastDetailScreenState extends State<DailyForecastDetailScreen> {
                                   const SizedBox(height: 6),
                                   Text(
                                     l10n.clearVisibility,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: subtitleColor,
                                       fontSize: 11,
                                       fontWeight: FontWeight.w500,
@@ -992,7 +992,7 @@ class _DailyForecastDetailScreenState extends State<DailyForecastDetailScreen> {
                                 children: [
                                   Text(
                                     l10n.pollenTypes,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: subtitleColor,
                                       fontSize: 10,
                                       fontWeight: FontWeight.w500,
@@ -1075,7 +1075,7 @@ class _DailyForecastDetailScreenState extends State<DailyForecastDetailScreen> {
                               ),
                               Text(
                                 l10n.basedOnForecast,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: subtitleColor,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w500,
@@ -1136,7 +1136,7 @@ class _DailyForecastDetailScreenState extends State<DailyForecastDetailScreen> {
                                 children: [
                                   Text(
                                     l10n.sunrise.toUpperCase(),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: subtitleColor,
                                       fontSize: 10,
                                       fontWeight: FontWeight.w700,
@@ -1202,7 +1202,7 @@ class _DailyForecastDetailScreenState extends State<DailyForecastDetailScreen> {
                                 children: [
                                   Text(
                                     l10n.sunset.toUpperCase(),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: subtitleColor,
                                       fontSize: 10,
                                       fontWeight: FontWeight.w700,

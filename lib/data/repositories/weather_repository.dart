@@ -126,44 +126,44 @@ class WeatherRepository {
 
     final hourlyTimes = hourlyRaw['time'] as List<dynamic>;
     final hourly = List.generate(hourlyTimes.length, (i) {
-      num? _n(String k) =>
+      num? n(String k) =>
           (hourlyRaw[k] as List?)?.elementAtOrNull(i) as num?;
       return HourlyWeatherDomain(
         time: hourlyTimes[i] as String,
-        temperature: _n('temperature_2m')?.toDouble() ?? 0.0,
-        weatherCode: _n('weather_code')?.toInt() ?? 0,
+        temperature: n('temperature_2m')?.toDouble() ?? 0.0,
+        weatherCode: n('weather_code')?.toInt() ?? 0,
         precipitationProbability:
-            _n('precipitation_probability')?.toInt() ?? 0,
-        humidity: _n('relative_humidity_2m')?.toInt(),
-        windSpeed: _n('wind_speed_10m')?.toDouble() ?? 0.0,
-        windDirection: _n('wind_direction_10m')?.toInt() ?? 0,
-        windGusts: _n('wind_gusts_10m')?.toDouble(),
-        pressure: _n('surface_pressure')?.toDouble() ?? 1013.2,
-        visibility: _n('visibility')?.toDouble() ?? 10000.0,
-        isDay: _n('is_day')?.toInt() ?? 1,
-        cloudCover: _n('cloud_cover')?.toInt(),
+            n('precipitation_probability')?.toInt() ?? 0,
+        humidity: n('relative_humidity_2m')?.toInt(),
+        windSpeed: n('wind_speed_10m')?.toDouble() ?? 0.0,
+        windDirection: n('wind_direction_10m')?.toInt() ?? 0,
+        windGusts: n('wind_gusts_10m')?.toDouble(),
+        pressure: n('surface_pressure')?.toDouble() ?? 1013.2,
+        visibility: n('visibility')?.toDouble() ?? 10000.0,
+        isDay: n('is_day')?.toInt() ?? 1,
+        cloudCover: n('cloud_cover')?.toInt(),
       );
     });
 
     final dailyTimes = dailyRaw['time'] as List<dynamic>;
     final daily = List.generate(dailyTimes.length, (i) {
-      num? _d(String k) =>
+      num? d(String k) =>
           (dailyRaw[k] as List?)?.elementAtOrNull(i) as num?;
-      String? _s(String k) =>
+      String? s(String k) =>
           (dailyRaw[k] as List?)?.elementAtOrNull(i) as String?;
       return DailyWeatherDomain(
         time: dailyTimes[i] as String,
-        maxTemp: _d('temperature_2m_max')?.toDouble() ?? 0.0,
-        minTemp: _d('temperature_2m_min')?.toDouble() ?? 0.0,
-        weatherCode: _d('weather_code')?.toInt() ?? 0,
-        sunrise: _s('sunrise'),
-        sunset: _s('sunset'),
-        uvIndex: _d('uv_index_max')?.toDouble() ?? 0.0,
+        maxTemp: d('temperature_2m_max')?.toDouble() ?? 0.0,
+        minTemp: d('temperature_2m_min')?.toDouble() ?? 0.0,
+        weatherCode: d('weather_code')?.toInt() ?? 0,
+        sunrise: s('sunrise'),
+        sunset: s('sunset'),
+        uvIndex: d('uv_index_max')?.toDouble() ?? 0.0,
         precipitationProbability:
-            _d('precipitation_probability_max')?.toInt() ?? 0,
-        precipitationSum: _d('precipitation_sum')?.toDouble() ?? 0.0,
-        windSpeedMax: _d('wind_speed_10m_max')?.toDouble() ?? 0.0,
-        apparentTempMax: _d('apparent_temperature_max')?.toDouble() ?? 0.0,
+            d('precipitation_probability_max')?.toInt() ?? 0,
+        precipitationSum: d('precipitation_sum')?.toDouble() ?? 0.0,
+        windSpeedMax: d('wind_speed_10m_max')?.toDouble() ?? 0.0,
+        apparentTempMax: d('apparent_temperature_max')?.toDouble() ?? 0.0,
         moonPhase: _calculateMoonPhase(dailyTimes[i] as String),
       );
     });

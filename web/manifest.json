@@ -1,11 +1,11 @@
 {
-    "name": "USA Weather",
+    "name": "USA Weather: Live Radar & NOAA Forecast",
     "short_name": "USA Weather",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0A0E2E",
     "theme_color": "#0A0E2E",
-    "description": "Weather for USA & Beyond — real-time weather, 7-day forecasts, radar and air quality.",
+    "description": "Accurate USA weather forecast, live Doppler radar, NOAA storm and hurricane alerts, air quality index & UV index.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

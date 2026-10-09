@@ -11,7 +11,7 @@ class AppLocalizations {
       _AppLocalizationsDelegate();
 
   static const List<Locale> supportedLocales = [
-    Locale('es'), Locale('en'), Locale('fr'), Locale('de'), Locale('it'),
+    Locale('en'), Locale('es'), Locale('fr'), Locale('de'), Locale('it'),
     Locale('pt'), Locale('ru'), Locale('zh'), Locale('ja'), Locale('ko'),
     Locale('ar'), Locale('hi'), Locale('bn'), Locale('tr'), Locale('nl'),
     Locale('pl'), Locale('sv'), Locale('el'), Locale('th'), Locale('vi'),
@@ -19,7 +19,7 @@ class AppLocalizations {
 
   static AppLocalizations of(BuildContext context) {
     return Localizations.of<AppLocalizations>(context, AppLocalizations) ??
-        AppLocalizations(const Locale('es'));
+        AppLocalizations(const Locale('en'));
   }
 
   String get _lang => locale.languageCode;

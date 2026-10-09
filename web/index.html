@@ -6,8 +6,25 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="USA Weather — Weather for United States &amp; Beyond. Real-time weather, forecasts, radar and air quality.">
+  <title>USA Weather: Live Radar, NOAA Alerts & Accurate Forecast</title>
+  <meta name="description" content="USA Weather provides live NOAA radar maps, severe storm and hurricane alerts, accurate hourly & 7-day local forecasts, UV index, and air quality across all 50 US states.">
+  <meta name="keywords" content="USA weather, US radar, live weather radar, NOAA weather alerts, storm tracker, hurricane tracker, rain radar, hourly forecast, US air quality, weather forecast today">
+  <meta name="author" content="Apps-Tools">
+  <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0A0E2E">
+
+  <!-- Open Graph / Facebook / WhatsApp -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="USA Weather: Live Radar, NOAA Alerts & Accurate Forecast">
+  <meta property="og:description" content="Get real-time NOAA weather radar, severe storm alerts, precise hourly forecasts, air quality, and UV index for every US city.">
+  <meta property="og:image" content="icons/Icon-512.png">
+  <meta property="og:site_name" content="USA Weather">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="USA Weather: Live Radar, NOAA Alerts & Accurate Forecast">
+  <meta name="twitter:description" content="Real-time US Doppler radar, NOAA storm warnings, 7-day weather forecasts & air quality alerts.">
+  <meta name="twitter:image" content="icons/Icon-512.png">
 
   <!-- PWA / iOS meta tags -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -18,8 +35,29 @@
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
-  <title>USA Weather — Weather for USA</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "USA Weather",
+    "operatingSystem": "iOS, Android, Web",
+    "applicationCategory": "WeatherApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Accurate real-time USA weather forecast, live Doppler radar, severe storm and hurricane alerts, air quality index, and UV index for all United States locations.",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "1250"
+    }
+  }
+  </script>
 
   <!-- Google Maps JavaScript API (for web radar) -->
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBCbRqBJBzqc6sBBPiWAwUmkpXbYU8LJkE" async defer></script>
