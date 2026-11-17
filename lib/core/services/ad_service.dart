@@ -12,6 +12,10 @@ class AdService {
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
 
+  /// Compile-time flag to disable all ads for testing (`--dart-define=DISABLE_ADS=true`).
+  static const bool adsDisabled =
+      bool.fromEnvironment('DISABLE_ADS', defaultValue: false);
+
   // Interstitial state
   InterstitialAd? _interstitialAd;
   bool _isInterstitialLoading = false;
@@ -25,9 +29,9 @@ class AdService {
   DateTime? _lastAppOpenShown;
   static const Duration _appOpenCooldown = Duration(hours: 4);
 
-  /// True if current platform supports Google Mobile Ads (Android & iOS)
+  /// True if current platform supports Google Mobile Ads and ads are not disabled.
   bool get isPlatformSupported {
-    if (kIsWeb) return false;
+    if (adsDisabled || kIsWeb) return false;
     try {
       return Platform.isAndroid || Platform.isIOS;
     } catch (_) {

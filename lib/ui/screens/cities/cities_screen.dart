@@ -33,15 +33,6 @@ class CitiesScreen extends ConsumerStatefulWidget {
 class _CitiesScreenState extends ConsumerState<CitiesScreen> {
   final _ctrl = TextEditingController();
 
-  static const List<String> _regions = [
-    'All',
-    'East',
-    'West',
-    'Midwest',
-    'South',
-    'Pacific & Offshore',
-  ];
-
   @override
   void dispose() {
     _ctrl.dispose();
@@ -57,16 +48,11 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
     final l10n = AppLocalizations.of(context);
 
     // Filter local US cities
-    final filteredUsCities = UsCities.cities.where((city) {
-      final matchesRegion =
-          selectedRegion == 'All' || selectedRegion == 'Todas' || city.regionGroup == selectedRegion;
-      final q = query.trim().toLowerCase();
-      if (q.isEmpty) return matchesRegion;
-      final matchesQuery = city.name.toLowerCase().contains(q) ||
-          city.state.toLowerCase().contains(q) ||
-          city.stateCode.toLowerCase().contains(q);
-      return matchesQuery;
-    }).toList();
+    final filteredUsCities = UsCities.filter(
+      query: query,
+      regionKey: selectedRegion,
+      localizeRegion: l10n.regionLabel,
+    );
 
     return Scaffold(
       backgroundColor:
@@ -155,12 +141,12 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: _regions.length,
+                itemCount: UsCities.regionKeys.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (context, i) {
-                  final reg = _regions[i];
+                  final reg = UsCities.regionKeys[i];
                   final isSelected = reg == selectedRegion;
-                  final displayLabel = (reg == 'All' || reg == 'Todas') ? l10n.allRegions : reg;
+                  final displayLabel = l10n.regionLabel(reg);
 
                   return GestureDetector(
                     onTap: () {
@@ -233,10 +219,10 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
                     padding: const EdgeInsets.only(left: 4, bottom: 8, top: 4),
                     child: Text(
                       query.isEmpty
-                          ? '${selectedRegion == "All" ? l10n.allRegions : selectedRegion} (${filteredUsCities.length})'
-                              .toUpperCase()
-                          : '${l10n.citiesTitle} (${filteredUsCities.length})'
-                              .toUpperCase(),
+                          ? (selectedRegion == 'All' || selectedRegion == 'Todas'
+                              ? l10n.usCitiesCount(filteredUsCities.length)
+                              : '${l10n.regionLabel(selectedRegion).toUpperCase()} (${filteredUsCities.length})')
+                          : l10n.citiesFoundCount(filteredUsCities.length),
                       style: TextStyle(
                         color: (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                         fontSize: 11,
@@ -273,7 +259,7 @@ class _CitiesScreenState extends ConsumerState<CitiesScreen> {
                           Padding(
                             padding: const EdgeInsets.only(left: 4, bottom: 8),
                             child: Text(
-                              'MORE RESULTS'.toUpperCase(),
+                              l10n.moreResults,
                               style: TextStyle(
                                 color: (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                                 fontSize: 11,

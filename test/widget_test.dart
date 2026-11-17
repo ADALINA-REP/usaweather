@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:usaweather/core/constants/us_cities.dart';
 import 'package:usaweather/data/models/location_data.dart';
 import 'package:usaweather/data/models/weather_domain.dart';
 import 'package:usaweather/ui/components/weather_icon.dart';
@@ -687,6 +688,54 @@ void main() {
       expect(fr.play, 'Lecture');
       expect(fr.pause, 'Pause');
       expect(fr.radarLive, 'EN DIRECT');
+    });
+  });
+
+  group('US Cities Regions & Localization Tests', () {
+    test('All UsCities belong to valid regionKeys and populate admin1 accurately', () {
+      expect(UsCities.cities.length, 50);
+      for (final city in UsCities.cities) {
+        expect(UsCities.regionKeys.contains(city.regionGroup), isTrue,
+            reason: '${city.name} has unknown regionGroup ${city.regionGroup}');
+        expect(city.state.isNotEmpty, isTrue);
+        expect(city.stateCode.length, 2);
+        expect(city.toLocationData().admin1, '${city.state} (${city.stateCode})');
+      }
+    });
+
+    test('UsCities.filter supports region, state, stateCode, and localized region queries', () {
+      final southeast = UsCities.filter(query: '', regionKey: 'Southeast');
+      expect(southeast.any((c) => c.name == 'Charlotte'), isTrue);
+      expect(southeast.any((c) => c.name == 'New York City'), isFalse);
+
+      final es = AppLocalizations(const Locale('es'));
+      final localizedMatch = UsCities.filter(
+        query: 'Noreste',
+        regionKey: 'All',
+        localizeRegion: es.regionLabel,
+      );
+      expect(localizedMatch.any((c) => c.name == 'New York City'), isTrue);
+
+      final stateCodeMatch = UsCities.filter(query: 'NC', regionKey: 'All');
+      expect(stateCodeMatch.map((c) => c.name), containsAll(['Charlotte', 'Raleigh']));
+    });
+
+    test('All supported locales have accurate US search hints and region translations', () {
+      for (final locale in AppLocalizations.supportedLocales) {
+        final l10n = AppLocalizations(locale);
+        final hintLower = l10n.searchCitiesHint.toLowerCase();
+        expect(hintLower.contains('province'), isFalse,
+            reason: '${locale.languageCode} searchCitiesHint contains province');
+        expect(hintLower.contains('provincia'), isFalse,
+            reason: '${locale.languageCode} searchCitiesHint contains provincia');
+        expect(l10n.searchHint.toLowerCase().contains('madrid'), isFalse,
+            reason: '${locale.languageCode} searchHint contains Madrid');
+        expect(l10n.searchCityInUsaTitle.endsWith('...'), isFalse,
+            reason: '${locale.languageCode} searchCityInUsaTitle ends with ...');
+        for (final key in UsCities.regionKeys) {
+          expect(l10n.regionLabel(key).isNotEmpty, isTrue);
+        }
+      }
     });
   });
 }

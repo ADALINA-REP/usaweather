@@ -1963,15 +1963,6 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
   List<LocationData> _onlineResults = [];
   bool _isSearchingOnline = false;
 
-  static const List<String> _regions = [
-    'All',
-    'East',
-    'West',
-    'Midwest',
-    'South',
-    'Pacific & Offshore',
-  ];
-
   @override
   void dispose() {
     _debounceTimer?.cancel();
@@ -2046,15 +2037,11 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
 
-    final qLower = _query.trim().toLowerCase();
-    final filteredUsCities = UsCities.cities.where((city) {
-      final matchesRegion =
-          _selectedRegion == 'All' || _selectedRegion == 'Todas' || city.regionGroup == _selectedRegion;
-      if (qLower.isEmpty) return matchesRegion;
-      return city.name.toLowerCase().contains(qLower) ||
-          city.state.toLowerCase().contains(qLower) ||
-          city.stateCode.toLowerCase().contains(qLower);
-    }).toList();
+    final filteredUsCities = UsCities.filter(
+      query: _query,
+      regionKey: _selectedRegion,
+      localizeRegion: l10n.regionLabel,
+    );
 
     // Filter out online duplicates
     final nonDuplicateOnline = _onlineResults.where((r) {
@@ -2163,12 +2150,12 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: _regions.length,
+                    itemCount: UsCities.regionKeys.length,
                     separatorBuilder: (_, __) => const SizedBox(width: 8),
                     itemBuilder: (context, i) {
-                      final reg = _regions[i];
+                      final reg = UsCities.regionKeys[i];
                       final isSelected = reg == _selectedRegion;
-                      final displayLabel = (reg == 'All' || reg == 'Todas') ? l10n.allRegions : reg;
+                      final displayLabel = l10n.regionLabel(reg);
                       return ChoiceChip(
                         label: Text(displayLabel),
                         selected: isSelected,
@@ -2212,8 +2199,10 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
                         padding: const EdgeInsets.only(left: 4, bottom: 8, top: 4),
                         child: Text(
                           _query.isEmpty
-                              ? 'US CITIES (${filteredUsCities.length})'
-                              : 'CITIES FOUND (${filteredUsCities.length})',
+                              ? (_selectedRegion == 'All' || _selectedRegion == 'Todas'
+                                  ? l10n.usCitiesCount(filteredUsCities.length)
+                                  : '${l10n.regionLabel(_selectedRegion).toUpperCase()} (${filteredUsCities.length})')
+                              : l10n.citiesFoundCount(filteredUsCities.length),
                           style: TextStyle(
                             color: (isDark ? Colors.white70 : Colors.black54)
                                 .withValues(alpha: 0.6),
@@ -2249,7 +2238,7 @@ class _CitySearchSheetState extends ConsumerState<_CitySearchSheet> {
                         Padding(
                           padding: const EdgeInsets.only(left: 4, bottom: 8),
                           child: Text(
-                            'MORE LOCATIONS / RESULTS'.toUpperCase(),
+                            l10n.moreResults,
                             style: TextStyle(
                               color: (isDark ? Colors.white70 : Colors.black54)
                                   .withValues(alpha: 0.6),
